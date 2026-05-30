@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("jwtToken");
   const joinBtn = document.getElementById("joinBtn");
   const profileMenu = document.querySelector(".profile-dropdown");
-  const API_BASE = "https://devc0nnect-back3nd-production.up.railway.app";
+  const API_BASE = "https://devc0nnect-back3nd-production-1f73.up.railway.app";
 
   if (token) {
     try {
@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       if (response.ok) {
-        if (profileMenu) profileMenu.style.display = "block";
+        if (joinBtn) joinBtn.style.display = "none";   // hide Join button
+        if (profileMenu) profileMenu.style.display = "block"; // show profile
       } else {
         localStorage.removeItem("jwtToken");
         if (joinBtn) joinBtn.style.display = "inline-block";
@@ -34,10 +35,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     logoutBtn.addEventListener("click", (e) => {
       e.preventDefault();
       localStorage.removeItem("jwtToken");
+      if (joinBtn) joinBtn.style.display = "inline-block";  // bring back Join
+      if (profileMenu) profileMenu.style.display = "none";  // hide profile
       window.location.href = "index.html";
     });
   }
 });
+
 
 // Protect OurCourse link
 const ourCourseLink = document.querySelector("a[href='our-course.html']");
