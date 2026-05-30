@@ -93,12 +93,13 @@ if (joinForm) {
       reasonOption: document.getElementById("reasonOption").value
     };
 
-    try {
-        const res = await fetch("https://devc0nnect-back3nd-production.up.railway.app/api/v1/signup/create-account", {
+        try {
+          const res = await fetch("https://devc0nnect-back3nd-production-1f73.up.railway.app/api/v1/signup/create-account", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
+
 
       const data = await res.json();
       console.log("Signup response:", data);
