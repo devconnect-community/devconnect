@@ -40,31 +40,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "index.html";
     });
   }
-});
 
-// Protect Q&A page
-const qnaLink = document.querySelector("a[href='q&a_page.html']");
-if (qnaLink) {
-  qnaLink.addEventListener("click", (e) => {
-    const token = localStorage.getItem("jwtToken");
+
+// 🔒 Protect Q&A page itself
+  if (window.location.pathname.endsWith("q&a_page.html")) {
     if (!token) {
-      e.preventDefault(); // stop navigation
       alert("You must sign in to access the Q&A page.");
-      
-      // Open the signin/signup modal
-      if (typeof openModal === "function") {
-        openModal();
-        // Force the signin form to show
-        setTimeout(() => {
-          const signupWrapper = document.getElementById("signupFormWrapper");
-          const signinWrapper = document.getElementById("signinFormWrapper");
-          if (signupWrapper && signinWrapper) {
-            signupWrapper.style.display = "none";
-            signinWrapper.style.display = "block";
-          }
-        }, 300);
-      }
+      window.location.replace("index.html#signin"); 
+      // This sends them back to the homepage and opens the signin modal
     }
-  });
-}
-
+  }
+});
