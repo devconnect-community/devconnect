@@ -43,14 +43,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-// Protect OurCourse link
-const ourCourseLink = document.querySelector("a[href='our-course.html']");
-if (ourCourseLink) {
-  ourCourseLink.addEventListener("click", (e) => {
+const qnaLink = document.querySelector("a[href='q&a_page.html']");
+if (qnaLink) {
+  qnaLink.addEventListener("click", (e) => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       e.preventDefault();
-      alert("You must sign in to access OurCourse.");
+      alert("You must sign in to access the Q&A page.");
       if (typeof openModal === "function") {
         openModal();
       }
