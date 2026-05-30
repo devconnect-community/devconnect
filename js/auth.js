@@ -42,17 +42,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-
+// Protect Q&A page
 const qnaLink = document.querySelector("a[href='q&a_page.html']");
 if (qnaLink) {
   qnaLink.addEventListener("click", (e) => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
-      e.preventDefault();
+      e.preventDefault(); // stop navigation
       alert("You must sign in to access the Q&A page.");
+      
+      // Open the signin/signup modal
       if (typeof openModal === "function") {
         openModal();
+        // Force the signin form to show
+        setTimeout(() => {
+          const signupWrapper = document.getElementById("signupFormWrapper");
+          const signinWrapper = document.getElementById("signinFormWrapper");
+          if (signupWrapper && signinWrapper) {
+            signupWrapper.style.display = "none";
+            signinWrapper.style.display = "block";
+          }
+        }, 300);
       }
     }
   });
 }
+
