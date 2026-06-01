@@ -141,9 +141,9 @@
     <button class="leaderboard-btn" onclick="showPage('leaderboard-mobile')">Leaderboard</button>
   </div>
 
- <!-- Ask Question box (mobile) -->
+<!-- Ask Question box (mobile) -->
 <div class="ask-box collapsed">
-  <!-- Only the button shows at first -->
+  <!-- Toggle button (shows at first, opens the box) -->
   <button class="ask-btn" onclick="toggleAskBox(this)">Ask Question</button>
 
   <!-- Title input -->
@@ -161,9 +161,12 @@
       <i class="fas fa-paperclip"></i>
     </span>
   </div>
-   <button class="submit-question">Submit Question</button>
-  <button class="ask-btn" onclick="toggleAskBox(this)">Cancel</button>
+
+  <!-- Action buttons inside the box -->
+  <button class="submit-question">Submit Question</button>
+  <button class="cancel-btn" onclick="toggleAskBox(this)">Cancel</button>
 </div>
+
 
 
   <!-- Mobile Recent Questions list -->

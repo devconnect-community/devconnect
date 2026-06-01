@@ -268,3 +268,13 @@ async function loadLeaderboard() {
 }
 
 window.addEventListener("DOMContentLoaded", loadLeaderboard);
+
+
+document.querySelectorAll('.submit-question').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const title = document.querySelector('.question-title').value;
+    const content = document.querySelector('.question-content').value;
+    const imageUrl = null;
+    await submitQuestion(title, content, imageUrl);
+  });
+});

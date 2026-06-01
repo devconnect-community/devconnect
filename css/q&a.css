@@ -78,6 +78,10 @@ h2, h3 {
   opacity: 1;
 }
 
+.ask-box button {
+  margin-top: 10px;
+  display: inline-block;
+}
 
 .ask-box.collapsed .question-title,
 .ask-box.collapsed .question-content,
