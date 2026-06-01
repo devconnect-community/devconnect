@@ -17,159 +17,152 @@ function toggleReply(button) {
   }
 }
 
-/* ------------------ DESKTOP ------------------ */
-function showQuestionDesktop(element) {
-  const title = element.querySelector('.question-title')?.innerText || '';
-  const snippet = element.querySelector('.question-snippet')?.innerText || '';
-  const meta = element.querySelector('.meta')?.innerText || '';
-  const imageSrc = element.querySelector('img')?.getAttribute('src') || '';
-  const imageAlt = element.querySelector('img')?.getAttribute('alt') || '';
+// ✅ Submit Question
+async function submitQuestion(title, content, imageUrl) {
+  const token = localStorage.getItem("jwtToken");
+  const res = await fetch(`${API_BASE}/api/v1/qna/questions`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ title, content, imageUrl })
+  });
 
-  // Fill placeholders
-  document.getElementById('answer-title').innerText = title;
-  document.getElementById('answer-text').innerText = snippet;
-  document.getElementById('answer-meta').innerText = meta;
+  const data = await res.json();
+
+  if (res.ok) {
+    alert(data.message); // "QUESTION_SUCCESSFULLY_CREATED"
+    await loadRecentQuestions(); // refresh list
+  } else {
+    alert("Failed to create question");
+  }
+}
+
+// ✅ Hook Ask Question button (desktop/mobile)
+document.querySelectorAll('.ask-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const title = document.querySelector('.question-title').value;
+    const content = document.querySelector('.question-content').value;
+    const imageUrl = null; // or upload logic
+    await submitQuestion(title, content, imageUrl);
+  });
+});
+
+// ✅ Hook Submit Answer button
+document.querySelector('.submit-answer').addEventListener('click', async () => {
+  const questionId = document.getElementById('answer-title').getAttribute('data-id');
+  const content = document.querySelector('.answer-textarea').value;
+  const imageUrl = null; // or upload logic
+  await submitAnswer(questionId, content, imageUrl);
+});
+
+/* ------------------ DESKTOP ------------------ */
+async function showQuestionDesktop(element) {
+  const questionId = element.getAttribute("data-id");
+  const token = localStorage.getItem("jwtToken");
+
+  const res = await fetch(`${API_BASE}/api/v1/qna/questions/${questionId}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  const data = await res.json();
+
+  const question = data.data.question;
+  const answers = data.data.answers;
+
+  document.getElementById('answer-title').innerText = question.title;
+  document.getElementById('answer-text').innerText = question.content;
+  document.getElementById('answer-meta').innerText = `Asked by ${question.userName}`;
+  document.getElementById('answer-title').setAttribute("data-id", question.id);
 
   const answerImages = document.getElementById('answer-images');
   answerImages.innerHTML = '';
-  if (imageSrc) {
+  if (question.imageUrl) {
     const clone = document.createElement('img');
-    clone.src = imageSrc;
-    clone.alt = imageAlt;
+    clone.src = question.imageUrl;
+    clone.alt = question.title;
     clone.className = 'uploaded-img';
     answerImages.appendChild(clone);
   }
 
-  // Inject answers
   const answersContainer = document.getElementById('answers-container-desktop');
   answersContainer.innerHTML = '';
-
-  const answers = [
-    { name: "Clara Ugwu", helpful: 7, text: "This is a placeholder answer.", avatar: "images/team-image/Kajinake.png" },
-    { name: "Bryan Okafor", helpful: 25, text: "Check your controller mappings and debug the stack trace carefully.", avatar: "images/team-image/Bryan.png" },
-    { name: "Ada Ebube", helpful: 7, text: "Try enabling debug logs in Spring Boot to trace the NullPointerException.", avatar: "images/team-image/Ada.png" }
-  ];
-
   answers.forEach(ans => {
     answersContainer.innerHTML += `
       <div class="answer">
-        <img src="${ans.avatar}" alt="${ans.name}" class="avatar">
+        <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
         <div class="answer-content">
           <p>
-            <strong>${ans.name}</strong>
-            <span class="meta">– <span class="helpful-count">${ans.helpful}</span> helpful</span>
-            <span class="timestamp">Posted just now</span>
+            <strong>${ans.userName}</strong>
+            <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
+            <span class="timestamp">${ans.timestamp}</span>
           </p>
-          <p>${ans.text}</p>
+          <p>${ans.content}</p>
           <div class="actions">
-            <button class="like"><i class="fas fa-thumbs-up"></i> Like</button>
-            <button class="dislike"><i class="fas fa-thumbs-down"></i> Unlike</button>
-            <button class="delete"><i class="fas fa-trash"></i> Delete</button>
+            <button onclick="voteAnswer(${ans.id}, 'upvote')"><i class="fas fa-thumbs-up"></i> Like</button>
+            <button onclick="voteAnswer(${ans.id}, 'downvote')"><i class="fas fa-thumbs-down"></i> Unlike</button>
+            <button onclick="deleteAnswer(${ans.id})"><i class="fas fa-trash"></i> Delete</button>
             <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
           </div>
           <div class="reply-box">
             <textarea placeholder="Write your reply..."></textarea>
-            <input type="file" accept="image/*">
-            <button class="submit-reply">Submit Reply</button>
+            <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
           </div>
         </div>
       </div>
     `;
   });
-
-  // Attach listeners
-  answersContainer.querySelectorAll('.like').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const countEl = btn.closest('.answer').querySelector('.helpful-count');
-      countEl.textContent = parseInt(countEl.textContent) + 1;
-    });
-  });
-
-  answersContainer.querySelectorAll('.dislike').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const countEl = btn.closest('.answer').querySelector('.helpful-count');
-      countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
-    });
-  });
-
-  answersContainer.querySelectorAll('.delete').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.closest('.answer').remove();
-    });
-  });
 }
 
 /* ------------------ MOBILE ------------------ */
-function showPage(pageId) {
-  document.querySelectorAll('.page.mobile-only').forEach(page => {
-    page.classList.remove('active');
+async function showQuestionMobile(element) {
+  const questionId = element.getAttribute("data-id");
+  const token = localStorage.getItem("jwtToken");
+
+  const res = await fetch(`${API_BASE}/api/v1/qna/questions/${questionId}`, {
+    headers: { "Authorization": `Bearer ${token}` }
   });
-  document.getElementById(pageId).classList.add('active');
-}
+  const data = await res.json();
 
-function toggleAnswerBoxMobile(button) {
-  const answerBox = button.closest('#answers-mobile').querySelector('.answer-box');
-  if (!answerBox) return;
+  const question = data.data.question;
+  const answers = data.data.answers;
 
-  answerBox.classList.toggle('expanded');
-}
-
-document.querySelector('.hamburger').addEventListener('click', () => {
-  document.querySelector('.nav-links').classList.toggle('open');
-});
-
-
-
-function showQuestionMobile(element) {
-  const title = element.querySelector(".question-title")?.innerText || "";
-  const snippet = element.querySelector(".question-snippet")?.innerText || "";
-  const meta = element.querySelector(".meta")?.innerText || "";
-  const imageSrc = element.querySelector("img")?.getAttribute("src") || "";
-  const imageAlt = element.querySelector("img")?.getAttribute("alt") || "";
-
-  document.getElementById("answer-title-mobile").innerText = title;
-  document.getElementById("answer-meta-mobile").innerText = meta;
-  document.getElementById("answer-text-mobile").innerText = snippet;
+  document.getElementById("answer-title-mobile").innerText = question.title;
+  document.getElementById("answer-meta-mobile").innerText = `Asked by ${question.userName}`;
+  document.getElementById("answer-text-mobile").innerText = question.content;
 
   const answerImages = document.getElementById("answer-images-mobile");
   answerImages.innerHTML = "";
-  if (imageSrc) {
+  if (question.imageUrl) {
     const clone = document.createElement("img");
-    clone.src = imageSrc;
-    clone.alt = imageAlt;
+    clone.src = question.imageUrl;
+    clone.alt = question.title;
     clone.className = "uploaded-img";
     answerImages.appendChild(clone);
   }
 
   const answersContainer = document.getElementById("answers-container-mobile");
   answersContainer.innerHTML = "";
-
-  const answers = [
-    { name: "Clara Ugwu", helpful: 7, text: "This is a placeholder answer.", avatar: "images/team-image/Kajinake.png" },
-    { name: "Bryan Okafor", helpful: 25, text: "Check your controller mappings and debug the stack trace carefully.", avatar: "images/team-image/Bryan.png" },
-    { name: "Ada Ebube", helpful: 7, text: "Try enabling debug logs in Spring Boot to trace the NullPointerException.", avatar: "images/team-image/Ada.png" }
-  ];
-
   answers.forEach(ans => {
     answersContainer.innerHTML += `
       <div class="answer">
-        <img src="${ans.avatar}" alt="${ans.name}" class="avatar">
+        <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
         <div class="answer-content">
           <p>
-            <strong>${ans.name}</strong>
-            <span class="meta">– <span class="helpful-count">${ans.helpful}</span> helpful</span>
-            <span class="timestamp">Posted just now</span>
+            <strong>${ans.userName}</strong>
+            <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
+            <span class="timestamp">${ans.timestamp}</span>
           </p>
-          <p>${ans.text}</p>
+          <p>${ans.content}</p>
           <div class="actions">
-            <button class="like">Like</button>
-            <button class="dislike">Unlike</button>
-            <button class="delete">Delete</button>
+            <button onclick="voteAnswer(${ans.id}, 'upvote')">Like</button>
+            <button onclick="voteAnswer(${ans.id}, 'downvote')">Unlike</button>
+            <button onclick="deleteAnswer(${ans.id})">Delete</button>
             <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
           </div>
           <div class="reply-box">
             <textarea placeholder="Write your reply..."></textarea>
-            <button class="submit-reply">Submit Reply</button>
+            <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
           </div>
         </div>
       </div>
@@ -178,3 +171,100 @@ function showQuestionMobile(element) {
 
   showPage("answers-mobile");
 }
+
+// ✅ Answer actions
+async function voteAnswer(answerId, type) {
+  const token = localStorage.getItem("jwtToken");
+  await fetch(`${API_BASE}/api/v1/qna/answers/${answerId}/vote?voteType=${type}`, {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+}
+
+async function deleteAnswer(answerId) {
+  const token = localStorage.getItem("jwtToken");
+  await fetch(`${API_BASE}/api/v1/qna/answers/${answerId}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+}
+
+async function submitReply(questionId, parentAnswerId, btn) {
+  const token = localStorage.getItem("jwtToken");
+  const replyBox = btn.closest('.reply-box');
+  const content = replyBox.querySelector("textarea").value;
+
+  await fetch(`${API_BASE}/api/v1/qna/answers/${parentAnswerId}/reply`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ questionId, content })
+  });
+  alert("Reply submitted!");
+}
+
+// ✅ Submit Answer
+async function submitAnswer(questionId, content, imageUrl) {
+  const token = localStorage.getItem("jwtToken");
+  const res = await fetch(`${API_BASE}/api/v1/qna/answers`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ questionId, content, imageUrl })
+  });
+  const data = await res.json();
+  alert(data.message); // "ANSWER_SUCCESSFULLY_ADDED"
+}
+
+async function loadRecentQuestions() {
+  const token = localStorage.getItem("jwtToken");
+  const res = await fetch(`${API_BASE}/api/v1/qna/questions`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  const data = await res.json();
+
+  const list = document.querySelector(".recent-questions ul");
+  list.innerHTML = "";
+
+  data.data.forEach(q => {
+    list.innerHTML += `
+      <li data-id="${q.id}" onclick="showQuestionDesktop(this)">
+        <h4 class="question-title">${q.title}</h4>
+        <p class="question-snippet">${q.content.substring(0, 100)}...</p>
+        <span class="meta">Asked by ${q.userName} | ${q.createdAt}</span>
+        ${q.imageUrl ? `<img src="${q.imageUrl}" alt="${q.title}" class="uploaded-img">` : ""}
+      </li>
+    `;
+  });
+}
+
+// Run when page loads
+window.addEventListener("DOMContentLoaded", loadRecentQuestions);
+
+async function loadLeaderboard() {
+  const token = localStorage.getItem("jwtToken");
+  const res = await fetch(`${API_BASE}/api/v1/qna/leaderboard`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  const data = await res.json();
+
+  const tbody = document.querySelector(".leaderboard-table tbody");
+  tbody.innerHTML = "";
+
+  data.data.forEach((entry, index) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${entry.userName}</td>
+        <td>${entry.helpfulVotes}</td>
+        <td>${entry.points}</td>
+      </tr>
+    `;
+  });
+}
+
+window.addEventListener("DOMContentLoaded", loadLeaderboard);

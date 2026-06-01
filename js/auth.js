@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
-// 🔒 Protect Q&A page itself
   if (window.location.pathname.endsWith("q&a_page.html")) {
     if (!token) {
       alert("You must sign in to access the Q&A page.");
