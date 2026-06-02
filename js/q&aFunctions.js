@@ -63,11 +63,9 @@ async function showQuestionDesktop(element) {
   const questionId = element.getAttribute("data-id");
   const token = localStorage.getItem("jwtToken");
 
-  // Corrected endpoint: /questions/{id}
   const res = await fetch(`${API_BASE}/questions/${questionId}`, {
     headers: { "Authorization": `Bearer ${token}` }
   });
-
   const data = await res.json();
 
   const question = data.data.question;
@@ -88,37 +86,52 @@ async function showQuestionDesktop(element) {
     answerImages.appendChild(clone);
   }
 
- const answersContainer = document.getElementById('answers-container-desktop');
-answersContainer.innerHTML = '';
-answers.forEach(ans => {
-  answersContainer.innerHTML += `
-    <div class="answer" data-id="${ans.id}">
-      <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
-      <div class="answer-content">
-        <p>
-          <strong>${ans.userName}</strong>
-          <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
-          <span class="timestamp">${ans.timestamp}</span>
-        </p>
-        <p>${ans.content}</p>
-        <div class="actions">
-          <button onclick="voteAnswer(${ans.id}, 'upvote')"><i class="fas fa-thumbs-up"></i> Like</button>
-          <button onclick="voteAnswer(${ans.id}, 'downvote')"><i class="fas fa-thumbs-down"></i> Unlike</button>
-          <button onclick="deleteAnswer(${ans.id})"><i class="fas fa-trash"></i> Delete</button>
-          <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
-        </div>
-        <div class="reply-box">
-          <textarea placeholder="Write your reply..."></textarea>
-          <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
-        </div>
-      </div>
+  const answersContainer = document.getElementById('answers-container-desktop');
+  answersContainer.innerHTML = '';
 
-      <!-- Replies nested here -->
-      <div class="replies"></div>
-    </div>
-  `;
-});
+  answers.forEach(ans => {
+    answersContainer.innerHTML += `
+      <div class="answer" data-id="${ans.id}">
+        <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
+        <div class="answer-content">
+          <p>
+            <strong>${ans.userName}</strong>
+            <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
+            <span class="timestamp">${ans.timestamp}</span>
+          </p>
+          <p>${ans.content}</p>
+          <div class="actions">
+            <button onclick="voteAnswer(${ans.id}, 'upvote')">Like</button>
+            <button onclick="voteAnswer(${ans.id}, 'downvote')">Unlike</button>
+            <button onclick="deleteAnswer(${ans.id})">Delete</button>
+            <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+          </div>
+          <div class="reply-box">
+            <textarea placeholder="Write your reply..."></textarea>
+            <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
+          </div>
+        </div>
+        <div class="replies" id="replies-${ans.id}"></div>
+      </div>
+    `;
+
+    // ✅ Render replies if they exist
+    if (ans.replies && ans.replies.length > 0) {
+      const repliesContainer = document.getElementById(`replies-${ans.id}`);
+      ans.replies.forEach(rep => {
+        repliesContainer.innerHTML += `
+          <div class="reply">
+            <p><strong>${rep.userName}</strong> replied:</p>
+            <p>${rep.content}</p>
+            <span class="timestamp">${rep.timestamp}</span>
+          </div>
+        `;
+      });
+    }
+  });
 }
+
+
 /* ------------------ MOBILE ------------------ */
 async function showQuestionMobile(element) {
   const questionId = element.getAttribute("data-id");
@@ -147,38 +160,54 @@ async function showQuestionMobile(element) {
   }
 
   const answersContainer = document.getElementById("answers-container-mobile");
-answersContainer.innerHTML = "";
-answers.forEach(ans => {
-  answersContainer.innerHTML += `
-    <div class="answer" data-id="${ans.id}">
-      <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
-      <div class="answer-content">
-        <p>
-          <strong>${ans.userName}</strong>
-          <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
-          <span class="timestamp">${ans.timestamp}</span>
-        </p>
-        <p>${ans.content}</p>
-        <div class="actions">
-          <button onclick="voteAnswer(${ans.id}, 'upvote')">Like</button>
-          <button onclick="voteAnswer(${ans.id}, 'downvote')">Unlike</button>
-          <button onclick="deleteAnswer(${ans.id})">Delete</button>
-          <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+  answersContainer.innerHTML = "";
+
+  // ✅ Only one loop here
+  answers.forEach(ans => {
+    answersContainer.innerHTML += `
+      <div class="answer" data-id="${ans.id}">
+        <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
+        <div class="answer-content">
+          <p>
+            <strong>${ans.userName}</strong>
+            <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
+            <span class="timestamp">${ans.timestamp}</span>
+          </p>
+          <p>${ans.content}</p>
+          <div class="actions">
+            <button onclick="voteAnswer(${ans.id}, 'upvote')">Like</button>
+            <button onclick="voteAnswer(${ans.id}, 'downvote')">Unlike</button>
+            <button onclick="deleteAnswer(${ans.id})">Delete</button>
+            <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+          </div>
+          <div class="reply-box">
+            <textarea placeholder="Write your reply..."></textarea>
+            <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
+          </div>
         </div>
-        <div class="reply-box">
-          <textarea placeholder="Write your reply..."></textarea>
-          <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
-        </div>
+        <div class="replies" id="replies-${ans.id}"></div>
       </div>
+    `;
 
-      <!-- Replies nested here -->
-      <div class="replies"></div>
-    </div>
-  `;
-});
+    // ✅ Render replies if they exist
+    if (ans.replies && ans.replies.length > 0) {
+      const repliesContainer = document.getElementById(`replies-${ans.id}`);
+      ans.replies.forEach(rep => {
+        repliesContainer.innerHTML += `
+          <div class="reply">
+            <p><strong>${rep.userName}</strong> replied:</p>
+            <p>${rep.content}</p>
+            <span class="timestamp">${rep.timestamp}</span>
+          </div>
+        `;
+      });
+    }
+  });
 
-showPage("answers-mobile");
+  showPage("answers-mobile");
 }
+
+
 
 async function voteAnswer(answerId, type) {
   const token = localStorage.getItem("jwtToken");
