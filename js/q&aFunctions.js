@@ -220,30 +220,34 @@ async function voteAnswer(answerId, type) {
   if (res.ok) {
     const answerDiv = document.querySelector(`.answer[data-id="${answerId}"]`);
     const helpfulCount = answerDiv.querySelector(".helpful-count");
+    const likeBtn = answerDiv.querySelector("button[onclick*='upvote']");
+    const unlikeBtn = answerDiv.querySelector("button[onclick*='downvote']");
 
     // Update count
     if (data.data && data.data.votes !== undefined) {
       helpfulCount.innerText = data.data.votes;
     }
 
-    // Highlight button
-    const likeBtn = answerDiv.querySelector("button[onclick*='upvote']");
-    const unlikeBtn = answerDiv.querySelector("button[onclick*='downvote']");
+    // Reset classes
     likeBtn.classList.remove("liked");
     unlikeBtn.classList.remove("unliked");
 
-    if (type === "upvote") {
-      likeBtn.classList.add("liked");
-    } else {
-      unlikeBtn.classList.add("unliked");
+    // Highlight based on backend response
+    if (data.data && data.data.userVote) {
+      if (data.data.userVote === "UPVOTE") {
+        likeBtn.classList.add("liked");
+      } else if (data.data.userVote === "DOWNVOTE") {
+        unlikeBtn.classList.add("unliked");
+      }
+      // if userVote is null → neutral, no highlight
     }
 
-    // Refresh leaderboard automatically
     await loadLeaderboard();
   } else {
     alert("Vote failed: " + data.msg);
   }
 }
+
 
 
 async function deleteAnswer(answerId) {
