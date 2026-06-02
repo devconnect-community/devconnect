@@ -82,16 +82,17 @@
       </table>
     </aside>
   </div>
-
+  
   <section class="answer-section desktop-only">
-    <div class="question-header">
-      <h2 id="answer-title"></h2>
-      <button class="answer-btn" onclick="toggleAnswerBox(this)">Answer Question</button>
-    </div>
-    <p class="meta" id="answer-meta"></p>
-    <p class="question-text" id="answer-text"></p>
-    <div id="answer-images"></div>
+  <div class="question-header">
+    <h2 id="answer-title"></h2>
+    <button class="answer-btn" onclick="toggleAnswerBox(this)">Answer Question</button>
+  </div>
+  <p class="meta" id="answer-meta"></p>
+  <p class="question-text" id="answer-text"></p>
+  <div id="answer-images"></div>
 
+  <!-- Answer input box -->
   <div class="answer-box collapsed">
     <div class="input-with-icon">
       <textarea class="answer-textarea" placeholder="Write your answer..."></textarea>
@@ -105,9 +106,11 @@
       <button class="cancel-answer" onclick="toggleAnswerBox(this)">Cancel</button>
     </div>
   </div>
-    <div id="answers-container-desktop">
-      <!-- answers will be injected here after clicking a question -->
-  </section>
+
+  <!-- Answers will be injected here dynamically -->
+  <div id="answers-container-desktop"></div>
+</section>
+
 
   <!-- MOBILE VIEW -->
   <div id="questions-mobile" class="page mobile-only active">

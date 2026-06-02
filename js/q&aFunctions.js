@@ -44,7 +44,7 @@
   const data = await res.json();
 
   if (res.ok) {
-    alert(data.message);
+    alert(data.msg);
     await loadRecentQuestions();
   } else {
     alert("Failed to create question");
@@ -88,33 +88,36 @@ async function showQuestionDesktop(element) {
     answerImages.appendChild(clone);
   }
 
-  const answersContainer = document.getElementById('answers-container-desktop');
-  answersContainer.innerHTML = '';
-  answers.forEach(ans => {
-    answersContainer.innerHTML += `
-      <div class="answer">
-        <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
-        <div class="answer-content">
-          <p>
-            <strong>${ans.userName}</strong>
-            <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
-            <span class="timestamp">${ans.timestamp}</span>
-          </p>
-          <p>${ans.content}</p>
-          <div class="actions">
-            <button onclick="voteAnswer(${ans.id}, 'upvote')"><i class="fas fa-thumbs-up"></i> Like</button>
-            <button onclick="voteAnswer(${ans.id}, 'downvote')"><i class="fas fa-thumbs-down"></i> Unlike</button>
-            <button onclick="deleteAnswer(${ans.id})"><i class="fas fa-trash"></i> Delete</button>
-            <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
-          </div>
-          <div class="reply-box">
-            <textarea placeholder="Write your reply..."></textarea>
-            <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
-          </div>
+ const answersContainer = document.getElementById('answers-container-desktop');
+answersContainer.innerHTML = '';
+answers.forEach(ans => {
+  answersContainer.innerHTML += `
+    <div class="answer" data-id="${ans.id}">
+      <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
+      <div class="answer-content">
+        <p>
+          <strong>${ans.userName}</strong>
+          <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
+          <span class="timestamp">${ans.timestamp}</span>
+        </p>
+        <p>${ans.content}</p>
+        <div class="actions">
+          <button onclick="voteAnswer(${ans.id}, 'upvote')"><i class="fas fa-thumbs-up"></i> Like</button>
+          <button onclick="voteAnswer(${ans.id}, 'downvote')"><i class="fas fa-thumbs-down"></i> Unlike</button>
+          <button onclick="deleteAnswer(${ans.id})"><i class="fas fa-trash"></i> Delete</button>
+          <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+        </div>
+        <div class="reply-box">
+          <textarea placeholder="Write your reply..."></textarea>
+          <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
         </div>
       </div>
-    `;
-  });
+
+      <!-- Replies nested here -->
+      <div class="replies"></div>
+    </div>
+  `;
+});
 }
 /* ------------------ MOBILE ------------------ */
 async function showQuestionMobile(element) {
@@ -144,34 +147,37 @@ async function showQuestionMobile(element) {
   }
 
   const answersContainer = document.getElementById("answers-container-mobile");
-  answersContainer.innerHTML = "";
-  answers.forEach(ans => {
-    answersContainer.innerHTML += `
-      <div class="answer">
-        <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
-        <div class="answer-content">
-          <p>
-            <strong>${ans.userName}</strong>
-            <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
-            <span class="timestamp">${ans.timestamp}</span>
-          </p>
-          <p>${ans.content}</p>
-          <div class="actions">
-            <button onclick="voteAnswer(${ans.id}, 'upvote')">Like</button>
-            <button onclick="voteAnswer(${ans.id}, 'downvote')">Unlike</button>
-            <button onclick="deleteAnswer(${ans.id})">Delete</button>
-            <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
-          </div>
-          <div class="reply-box">
-            <textarea placeholder="Write your reply..."></textarea>
-            <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
-          </div>
+answersContainer.innerHTML = "";
+answers.forEach(ans => {
+  answersContainer.innerHTML += `
+    <div class="answer" data-id="${ans.id}">
+      <img src="${ans.avatarUrl || 'images/default-avatar.png'}" alt="${ans.userName}" class="avatar">
+      <div class="answer-content">
+        <p>
+          <strong>${ans.userName}</strong>
+          <span class="meta">– <span class="helpful-count">${ans.votes}</span> helpful</span>
+          <span class="timestamp">${ans.timestamp}</span>
+        </p>
+        <p>${ans.content}</p>
+        <div class="actions">
+          <button onclick="voteAnswer(${ans.id}, 'upvote')">Like</button>
+          <button onclick="voteAnswer(${ans.id}, 'downvote')">Unlike</button>
+          <button onclick="deleteAnswer(${ans.id})">Delete</button>
+          <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+        </div>
+        <div class="reply-box">
+          <textarea placeholder="Write your reply..."></textarea>
+          <button onclick="submitReply(${question.id}, ${ans.id}, this)">Submit Reply</button>
         </div>
       </div>
-    `;
-  });
 
-  showPage("answers-mobile");
+      <!-- Replies nested here -->
+      <div class="replies"></div>
+    </div>
+  `;
+});
+
+showPage("answers-mobile");
 }
 
 async function voteAnswer(answerId, type) {
@@ -195,7 +201,7 @@ async function submitReply(questionId, parentAnswerId, btn) {
   const replyBox = btn.closest('.reply-box');
   const content = replyBox.querySelector("textarea").value;
 
-  await fetch(`${API_BASE}/answers/reply/${questionId}/${parentAnswerId}`, {
+  const res = await fetch(`${API_BASE}/answers/reply/${questionId}/${parentAnswerId}`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -203,7 +209,23 @@ async function submitReply(questionId, parentAnswerId, btn) {
     },
     body: JSON.stringify({ content })
   });
-  alert("Reply submitted!");
+
+  const data = await res.json();
+
+  // Find the correct answer block
+  const answerDiv = btn.closest('.answer');
+  const repliesContainer = answerDiv.querySelector('.replies');
+
+  // Append reply into the nested replies container
+  repliesContainer.innerHTML += `
+    <div class="reply">
+      <p><strong>${data.data.userName}</strong> replied:</p>
+      <p>${data.data.content}</p>
+    </div>
+  `;
+
+  // Clear the textarea
+  replyBox.querySelector("textarea").value = "";
 }
 
 async function submitAnswer(questionId, content, imageUrl) {
@@ -217,7 +239,7 @@ async function submitAnswer(questionId, content, imageUrl) {
     body: JSON.stringify({ questionId, content, imageUrl })
   });
   const data = await res.json();
-  alert(data.message);
+  alert(data.msg);
 }
 
 async function loadRecentQuestions() {
