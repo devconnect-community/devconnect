@@ -1,3 +1,5 @@
+  const API_BASE = "https://devc0nnect-back3nd-production-1f73.up.railway.app";
+
   function toggleAskBox(button) {
     const askBox = button.closest('.ask-section')?.querySelector('.ask-box')
               || button.closest('.page')?.querySelector('.ask-box'); 
