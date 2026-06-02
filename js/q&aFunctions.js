@@ -211,11 +211,31 @@ async function showQuestionMobile(element) {
 
 async function voteAnswer(answerId, type) {
   const token = localStorage.getItem("jwtToken");
-  await fetch(`${API_BASE}/answers/votes/${answerId}?voteType=${type}`, {
+  const res = await fetch(`${API_BASE}/answers/votes/${answerId}?voteType=${type}`, {
     method: "POST",
     headers: { "Authorization": `Bearer ${token}` }
   });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    // Find the answer element
+    const answerDiv = document.querySelector(`.answer[data-id="${answerId}"]`);
+    const helpfulCount = answerDiv.querySelector(".helpful-count");
+
+    // Update the helpful count if backend sends it back
+    if (data.data && data.data.votes !== undefined) {
+      helpfulCount.innerText = data.data.votes;
+    } else {
+      // fallback: increment manually
+      let current = parseInt(helpfulCount.innerText);
+      helpfulCount.innerText = type === "upvote" ? current + 1 : current - 1;
+    }
+  } else {
+    alert("Failed to register vote: " + data.msg);
+  }
 }
+
 
 async function deleteAnswer(answerId) {
   const token = localStorage.getItem("jwtToken");
