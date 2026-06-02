@@ -525,18 +525,23 @@
     padding: 8px;
   }
 
-.replies {
-  margin-left: 30px;
-  border-left: 2px solid #444;
-  padding-left: 10px;
+  .replies {
+  margin-left: 40px;         /* indent replies */
+  border-left: 2px solid #333; /* subtle vertical line */
+  padding-left: 12px;
 }
 
 .reply {
-  background-color: #222;
-  margin-top: 5px;
-  padding: 6px;
-  border-radius: 4px;
-  font-size: 0.9em;
+  background-color: #2e2a4a;  /* slightly different background */
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  color: #ddd;
+}
+
+.reply strong {
+  color: #ff7b00; /* highlight username */
 }
 
 
