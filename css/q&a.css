@@ -526,22 +526,22 @@
   }
 
   .replies {
-  margin-left: 40px;         /* indent replies */
-  border-left: 2px solid #333; /* subtle vertical line */
-  padding-left: 12px;
+  margin-left: 50px !important;  
+  border-left: 2px solid #333 !important;
+  padding-left: 12px !important;
 }
 
 .reply {
-  background-color: #2e2a4a;  /* slightly different background */
-  margin-top: 8px;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 0.85em;
-  color: #ddd;
+  background-color: #2e2a4a !important; 
+  margin-top: 6px !important;
+  padding: 8px !important;
+  border-radius: 6px !important;
+  font-size: 0.85em !important;
+  color: #ddd !important;
 }
 
 .reply strong {
-  color: #ff7b00; /* highlight username */
+  color: #ff7b00 !important;
 }
 
 
