@@ -1,89 +1,175 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DevConnect | Q&A Community</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/q&a.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
-   <header class="header">
-  <div class="container nav">
-    <div class="logo-container">
-      <img src="images/logo-1.png" alt="DevConnect Logo" class="logo-img" />
-      <a href="index.html" class="logo">{DevConnect}</a>
-    </div> 
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevConnect | Q&A Community</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/q&a.css"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  </head>
+  <body>
+    <header class="header">
+    <div class="container nav">
+      <div class="logo-container">
+        <img src="images/logo-1.png" alt="DevConnect Logo" class="logo-img" />
+        <a href="index.html" class="logo">{DevConnect}</a>
+      </div> 
 
-    <nav>
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="team.html">Team</a></li>
-        <!-- <li><a href="projects.html">Projects</a></li> -->
-        <!-- <li><a href="our-course.html">OurCourse</a></li> -->
-        <li><a href="events.html">Events</a></li>
-        <li><a href="q&a_page.html">Q&A</a></li>
-      </ul>
-    </nav>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="team.html">Team</a></li>
+          <!-- <li><a href="projects.html">Projects</a></li> -->
+          <!-- <li><a href="our-course.html">OurCourse</a></li> -->
+          <li><a href="events.html">Events</a></li>
+          <li><a href="q&a_page.html">Q&A</a></li>
+        </ul>
+      </nav>
 
-    <a href="#" id="joinBtn" class="btn-primary">Join Community</a>
-    <div class="dropdown profile-dropdown">
-          <button class="dropbtn">
-            <i class="fas fa-user-circle"></i>
-          </button>
-          <div class="dropdown-content">
-            <a href="#">Settings</a>
-            <a href="#">My Learning</a>
-            <a href="#" id="logoutBtn">Logout</a>
+      <a href="#" id="joinBtn" class="btn-primary">Join Community</a>
+      <div class="dropdown profile-dropdown">
+            <button class="dropbtn">
+              <i class="fas fa-user-circle"></i>
+            </button>
+            <div class="dropdown-content">
+              <a href="#">Settings</a>
+              <a href="#">My Learning</a>
+              <a href="#" id="logoutBtn">Logout</a>
+            </div>
           </div>
-        </div>
-    <div class="hamburger">☰</div>
-  </div>
+      <div class="hamburger">☰</div>
+    </div>
 
-</header>
-  <main class="main-container">
-    <!-- Left: Ask Question -->
+  </header>
+    <main class="main-container">
+
+      <!-- Left: Ask Question -->
     <section class="ask-section desktop-only">
-      <h2>Q&A Community</h2>
-
- <div class="ask-box collapsed">
-  <!-- Title input -->
-  <div class="input-with-icon">
+    <h2>Q&A Community</h2>
+  <button class="ask-btn" onclick="toggleAskBox(this)">Ask Question</button>
+  <div class="ask-box collapsed">
     <input type="text" class="question-title" placeholder="Enter your question title..." />
-  </div>
-
-  <!-- Content textarea -->
-  <div class="input-with-icon">
     <textarea class="question-content" placeholder="Describe your question in detail..."></textarea>
-    <!-- Hidden file input -->
-    <input type="file" id="fileUpload" accept="image/*" style="display:none;">
-    <!-- Paperclip icon inside textarea -->
-    <span class="upload-icon" onclick="document.getElementById('fileUpload').click()">
-      <i class="fas fa-paperclip"></i>
-    </span>
+    <button class="submit-question">Submit Question</button>
+    <button class="cancel-btn" onclick="toggleAskBox(this)">Cancel</button>
+  </div>
+    <div class="qa-container">
+      <div class="recent-questions">
+        <h3>Recent Questions</h3>
+        <ul></ul>
+      </div>
+    </div>
+  </section>
+
+
+    <div class="middle-column desktop-only">
+    <aside class="leaderboard">
+      <h3>Leaderboard</h3>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Helpful Votes</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Top 1–5 -->
+        </tbody>
+      </table>
+    </aside>
   </div>
 
-  <!-- Submit button -->
-  <button class="submit-question">Submit Question</button>
-  <button class="ask-btn" onclick="toggleAskBox(this)">Cancel</button>
-</div>
+  <section class="answer-section desktop-only">
+    <div class="question-header">
+      <h2 id="answer-title"></h2>
+      <button class="answer-btn" onclick="toggleAnswerBox(this)">Answer Question</button>
+    </div>
+    <p class="meta" id="answer-meta"></p>
+    <p class="question-text" id="answer-text"></p>
+    <div id="answer-images"></div>
 
-<div class="qa-container">
-<div class="recent-questions">
-  <h3>Recent Questions</h3>
-  <ul>
-    
-  </ul>
-</div>
-</div>
-</section>
+  <div class="answer-box collapsed">
+    <div class="input-with-icon">
+      <textarea class="answer-textarea" placeholder="Write your answer..."></textarea>
+      <input type="file" id="answerFileUpload" accept="image/*" style="display:none;">
+      <span class="upload-icon" onclick="document.getElementById('answerFileUpload').click()">
+        <i class="fas fa-paperclip"></i>
+      </span>
+    </div>
+    <div class="answer-actions">
+      <button class="submit-answer">Submit Answer</button>
+      <button class="cancel-answer" onclick="toggleAnswerBox(this)">Cancel</button>
+    </div>
+  </div>
+    <div id="answers-container-desktop">
+      <!-- answers will be injected here after clicking a question -->
+  </section>
 
-   <div class="middle-column desktop-only">
-  <!-- Leaderboard -->
-  <aside class="leaderboard">
-    <h3>Leaderboard</h3>
+  <!-- MOBILE VIEW -->
+  <div id="questions-mobile" class="page mobile-only active">
+    <h2>Recent Questions</h2>
+    <div class="nav-buttons">
+      <button class="leaderboard-btn" onclick="showPage('leaderboard-mobile')">Leaderboard</button>
+    </div>
+
+    <button class="ask-btn" onclick="toggleAskBox(this)">Ask Question</button>
+  <div class="ask-box collapsed">
+    <div class="input-with-icon">
+      <input type="text" class="question-title" placeholder="Enter your question title..." />
+    </div>
+
+    <!-- Content textarea with paperclip -->
+    <div class="input-with-icon">
+      <textarea class="question-content" placeholder="Describe your question in detail..."></textarea>
+      <input type="file" id="fileUploadMobile" accept="image/*" style="display:none;">
+      <span class="upload-icon" onclick="document.getElementById('fileUploadMobile').click()">
+        <i class="fas fa-paperclip"></i>
+      </span>
+    </div>
+    <button class="submit-question">Submit Question</button>
+    <button class="cancel-btn" onclick="toggleAskBox(this)">Cancel</button>
+  </div>
+    <section class="recent-questions">
+      <ul>
+      
+      </ul>
+    </section>
+  </div>
+  <!-- Mobile Answers page -->
+  <div id="answers-mobile" class="page mobile-only">
+    <div class="question-header">
+      <button class="back-btn" onclick="showPage('questions-mobile')">← Back to questions</button>
+      <h2 id="answer-title-mobile"></h2>
+    <button class="answer-btn" onclick="toggleAnswerBoxMobile(this)">Answer Question</button>
+    </div>
+    <p class="meta" id="answer-meta-mobile"></p>
+    <p class="question-text" id="answer-text-mobile"></p>
+    <div id="answer-images-mobile"></div>
+  <div class="answer-box collapsed">
+    <div class="input-with-icon">
+      <textarea class="answer-textarea" placeholder="Write your answer..."></textarea>
+      <input type="file" id="answerFileUploadMobile" accept="image/*" style="display:none;">
+      <span class="upload-icon" onclick="document.getElementById('answerFileUploadMobile').click()">
+        <i class="fas fa-paperclip"></i>
+      </span>
+    </div>
+    <div class="answer-actions">
+      <button class="submit-answer">Submit Answer</button>
+      <button class="cancel-answer" onclick="toggleAnswerBoxMobile(this)">Cancel</button>
+    </div>
+  </div>
+
+    <div id="answers-container-mobile"></div>
+  </div>
+  <div id="leaderboard-mobile" class="page mobile-only">
+    <button class="leaderboard-back-btn" onclick="showPage('questions-mobile')">
+      ← Back to Questions
+    </button>
+    <h2>Leaderboard</h2>
     <table class="leaderboard-table">
       <thead>
         <tr>
@@ -95,145 +181,12 @@
       </thead>
       <tbody>
         <!-- Top 1–5 -->
-        
       </tbody>
     </table>
-  </aside>
-</div>
-
-<section class="answer-section desktop-only">
-  <div class="question-header">
-    <h2 id="answer-title"></h2>
-    <button class="answer-btn" onclick="toggleAnswerBox(this)">Answer Question</button>
   </div>
 
-  <p class="meta" id="answer-meta"></p>
-  <p class="question-text" id="answer-text"></p>
-  <div id="answer-images"></div>
-
-  <!-- Answer input box -->
- <!-- Answer input box -->
-<div class="answer-box collapsed">
-  <div class="input-with-icon">
-    <textarea class="answer-textarea" placeholder="Write your answer..."></textarea>
-    <input type="file" id="answerFileUpload" accept="image/*" style="display:none;">
-    <span class="upload-icon" onclick="document.getElementById('answerFileUpload').click()">
-      <i class="fas fa-paperclip"></i>
-    </span>
-  </div>
-  <div class="answer-actions">
-    <button class="submit-answer">Submit Answer</button>
-    <button class="cancel-answer" onclick="toggleAnswerBox(this)">Cancel</button>
-  </div>
-</div>
-
-  <!-- Answers injected dynamically -->
-  <div id="answers-container-desktop">
-    <!-- answers will be injected here after clicking a question -->
-</section>
-
-<!-- MOBILE VIEW -->
-<div id="questions-mobile" class="page mobile-only active">
-  <h2>Recent Questions</h2>
-
-  <!-- Navigation buttons -->
-  <div class="nav-buttons">
-    <button class="leaderboard-btn" onclick="showPage('leaderboard-mobile')">Leaderboard</button>
-  </div>
-
-<!-- Ask Question box (mobile) -->
-<div class="ask-box collapsed">
-  <!-- Toggle button (shows at first, opens the box) -->
-  <button class="ask-btn" onclick="toggleAskBox(this)">Ask Question</button>
-
-  <!-- Title input -->
-  <div class="input-with-icon">
-    <input type="text" class="question-title" placeholder="Enter your question title..." />
-  </div>
-
-  <!-- Content textarea with paperclip -->
-  <div class="input-with-icon">
-    <textarea class="question-content" placeholder="Describe your question in detail..."></textarea>
-    <!-- Hidden file input -->
-    <input type="file" id="fileUploadMobile" accept="image/*" style="display:none;">
-    <!-- Paperclip icon -->
-    <span class="upload-icon" onclick="document.getElementById('fileUploadMobile').click()">
-      <i class="fas fa-paperclip"></i>
-    </span>
-  </div>
-
-  <!-- Action buttons inside the box -->
-  <button class="submit-question">Submit Question</button>
-  <button class="cancel-btn" onclick="toggleAskBox(this)">Cancel</button>
-</div>
-
-
-
-  <!-- Mobile Recent Questions list -->
-  <section class="recent-questions">
-    <ul>
-    
-    </ul>
-  </section>
-</div>
-
-
-<!-- Mobile Answers page -->
-<div id="answers-mobile" class="page mobile-only">
-  <div class="question-header">
-    <button class="back-btn" onclick="showPage('questions-mobile')">← Back to questions</button>
-    <h2 id="answer-title-mobile"></h2>
-  <button class="answer-btn" onclick="toggleAnswerBoxMobile(this)">Answer Question</button>
-  </div>
-
-  <p class="meta" id="answer-meta-mobile"></p>
-  <p class="question-text" id="answer-text-mobile"></p>
-  <div id="answer-images-mobile"></div>
-
-<!-- Hidden until expanded -->
-<div class="answer-box collapsed">
-  <div class="input-with-icon">
-    <textarea class="answer-textarea" placeholder="Write your answer..."></textarea>
-    <input type="file" id="answerFileUploadMobile" accept="image/*" style="display:none;">
-    <span class="upload-icon" onclick="document.getElementById('answerFileUploadMobile').click()">
-      <i class="fas fa-paperclip"></i>
-    </span>
-  </div>
-  <div class="answer-actions">
-    <button class="submit-answer">Submit Answer</button>
-    <button class="cancel-answer" onclick="toggleAnswerBoxMobile(this)">Cancel</button>
-  </div>
-</div>
-
-
-
-  <div id="answers-container-mobile"></div>
-</div>
-<div id="leaderboard-mobile" class="page mobile-only">
-  <!-- Back button at the top -->
-  <button class="leaderboard-back-btn" onclick="showPage('questions-mobile')">
-    ← Back to Questions
-  </button>
-
-  <h2>Leaderboard</h2>
-  <table class="leaderboard-table">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>User</th>
-        <th>Helpful Votes</th>
-        <th>Points</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Top 1–5 -->
-
-    </tbody>
-  </table>
-</div>
-
-</main>
-  <script src="js/q&aFunctions.js"></script>
-  <script src="js/auth.js"></script>
-</body>
-</html>
+  </main>
+    <script src="js/q&aFunctions.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
+  </html>
