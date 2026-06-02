@@ -541,6 +541,10 @@
   color: #ddd !important;
 }
 
+.actions button.liked { color: #00c853; } 
+.actions button.unliked { color: #ff1744; } 
+
+
 .reply strong {
   color: #ff7b00 !important;
 }

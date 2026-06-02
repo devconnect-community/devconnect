@@ -208,7 +208,6 @@ async function showQuestionMobile(element) {
 }
 
 
-
 async function voteAnswer(answerId, type) {
   const token = localStorage.getItem("jwtToken");
   const res = await fetch(`${API_BASE}/answers/votes/${answerId}?voteType=${type}`, {
@@ -219,31 +218,51 @@ async function voteAnswer(answerId, type) {
   const data = await res.json();
 
   if (res.ok) {
-    // Find the answer element
     const answerDiv = document.querySelector(`.answer[data-id="${answerId}"]`);
     const helpfulCount = answerDiv.querySelector(".helpful-count");
 
-    // Update the helpful count if backend sends it back
+    // Update count
     if (data.data && data.data.votes !== undefined) {
       helpfulCount.innerText = data.data.votes;
-    } else {
-      // fallback: increment manually
-      let current = parseInt(helpfulCount.innerText);
-      helpfulCount.innerText = type === "upvote" ? current + 1 : current - 1;
     }
+
+    // Highlight button
+    const likeBtn = answerDiv.querySelector("button[onclick*='upvote']");
+    const unlikeBtn = answerDiv.querySelector("button[onclick*='downvote']");
+    likeBtn.classList.remove("liked");
+    unlikeBtn.classList.remove("unliked");
+
+    if (type === "upvote") {
+      likeBtn.classList.add("liked");
+    } else {
+      unlikeBtn.classList.add("unliked");
+    }
+
+    // Refresh leaderboard automatically
+    await loadLeaderboard();
   } else {
-    alert("Failed to register vote: " + data.msg);
+    alert("Vote failed: " + data.msg);
   }
 }
 
 
 async function deleteAnswer(answerId) {
   const token = localStorage.getItem("jwtToken");
-  await fetch(`${API_BASE}/answers/${answerId}`, {
+  const res = await fetch(`${API_BASE}/answers/${answerId}`, {
     method: "DELETE",
     headers: { "Authorization": `Bearer ${token}` }
   });
+  const data = await res.json();
+
+  if (res.ok) {
+    alert("Answer deleted successfully");
+    document.querySelector(`.answer[data-id="${answerId}"]`).remove();
+    await loadLeaderboard();
+  } else {
+    alert("Failed to delete: " + data.msg);
+  }
 }
+
 
 async function submitReply(questionId, parentAnswerId, btn) {
   const token = localStorage.getItem("jwtToken");
